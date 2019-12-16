@@ -1,14 +1,14 @@
 ---
-title: "Using GeoDeepDive (xDD) to Track North American Breeding Bird Survey Citations"
+title: "Using GeoDeepDive (xDD) to Track North American Bird Banding Laboratory Citations"
 date: "Last updated: `r Sys.Date()`"
 output: github_document
 ---
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-lightgrey.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
 ## About
-This project seeks to identify publications within which the [USGS North American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/) has been referenced or mentioned. This project uses pre-extracted information available via API from the [GeoDeepDive](https://geodeepdive.org) infrastructure.
+This project seeks to identify publications within which the [USGS North American  Bird Banding Laboratory](https://www.usgs.gov/centers/pwrc/science/bird-banding-laboratory) has been referenced or mentioned. This project uses pre-extracted information available via API from the [GeoDeepDive](https://geodeepdive.org) infrastructure.
 
-## Overview of BBS in records available in the GeoDeepDive database.
+## Overview of BBL in records available in the GeoDeepDive database.
 
 ```{r setup, include=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
 ## if you open the .rproj you should be in the right directory, otherwise please set it here.
@@ -29,25 +29,25 @@ cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
 theme_set(ggpubr::theme_classic2())
 ```
 `r print(getwd())`
-```{r bbs_xdd_import_and_munge, message=FALSE, warning=FALSE,echo=FALSE}
+```{r bbl_xdd_import_and_munge, message=FALSE, warning=FALSE,echo=FALSE}
 # Import the JSON files and munge into a single data frame ----------------
 files <- list.files(here::here("xdd_json"), pattern='.txt', full.names=TRUE)
 
 # import and munge the xdd json into an R df
-bbs_xdd <- suppressWarnings(get_xdd_df(files)) # do not turn off suppresswarnings -- there an rmd bug its annoying..
+bbl_xdd <- suppressWarnings(get_xdd_df(files)) # do not turn off suppresswarnings -- there an rmd bug its annoying..
 ```
 
-We can use various search terms to identify potential uses of the [NABBS](https://www.pwrc.usgs.gov/bbs/) data or results in the literature. For example, here we found `r bbs_xdd %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unique publications which used any of the following phrases exactly: 
+We can use various search terms to identify potential uses of the BBL data or results in the literature. For example, here we found `r bbl_xdd %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unique publications which used any of the following phrases exactly: 
 
 Exacts earch phrase | Number of unique records in xDD/GDD 
 --------------|----
-"North American Breeding Bird Survey" | `r bbs_xdd %>% filter(searchterm=="North American Breeding Bird Survey") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
-"Breeding Bird Survey" |  `r bbs_xdd %>% filter(searchterm=="Breeding Bird Survey") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
-"NABBS" | `r bbs_xdd %>% filter(searchterm=="NABBS") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
+"North American Bird Banding Laboratory" | `r bbl_xdd %>% filter(searchterm=="North American Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
+"BBL" |  `r bbl_xdd %>% filter(searchterm=="BBL") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
+"Bird Banding Laboratory" | `r bbl_xdd %>% filter(searchterm=="Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
 
 
 ```{r pubsvtime, echo=FALSE}
-tmp <- bbs_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)   
+tmp <- bbl_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)   
 ggplot(tmp %>% group_by(searchterm, coveryear) %>% 
          summarise(total_pubs = n()) %>% na.omit() %>% 
          filter(coveryear <= 2022, coveryear >=1980)) +
@@ -58,12 +58,12 @@ ggplot(tmp %>% group_by(searchterm, coveryear) %>%
 ``` 
 
 
-When we remove the redundancies in the records returned using the abovementioned searches,`r bbs_xdd %>% dplyr::select(-filename, -highlight, -searchterm) %>% n_distinct() + bbs_xdd %>% dplyr::select(-filename, -highlight, -searchterm) %>% filter(is.na(doi))%>% distinct()  %>% nrow() ` remain. 
+When we remove the redundancies in the records returned using the abovementioned searches,`r bbl_xdd %>% dplyr::select(-filename, -highlight, -searchterm) %>% n_distinct() + bbl_xdd %>% dplyr::select(-filename, -highlight, -searchterm) %>% filter(is.na(doi))%>% distinct()  %>% nrow() ` remain. 
 
 We can visualize the distribution of  records among unique publishers. Few publications contain the bulk of the records. 
 ```{r topjrnls, echo=FALSE, message=FALSE, warning=FALSE}
-tmp <-  bbs_xdd %>% dplyr::select(-filename, -searchterm) %>% distinct()
-tmp <- bind_rows(tmp, bbs_xdd %>% dplyr::select(-filename, -searchterm)%>% filter(is.na(doi)) %>% distinct())
+tmp <-  bbl_xdd %>% dplyr::select(-filename, -searchterm) %>% distinct()
+tmp <- bind_rows(tmp, bbl_xdd %>% dplyr::select(-filename, -searchterm)%>% filter(is.na(doi)) %>% distinct())
 
 ggplot(tmp %>% group_by(pubname) %>% 
          summarise(n = n())) +
@@ -73,7 +73,7 @@ ggplot(tmp %>% group_by(pubname) %>%
 
 Viewing the publications with at least 25 unique records:
 ```{r topjrnls2, echo=FALSE, message=FALSE, warning=FALSE}
-tmp <- bbs_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)%>% group_by(pubname) %>% 
+tmp <- bbl_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)%>% group_by(pubname) %>% 
          summarise(n = n()) %>% filter(n >25)   
 ## the empty pubnames are USGS... so replace
 tmp$pubname <- sub("^$", "USGS", tmp$pubname)
