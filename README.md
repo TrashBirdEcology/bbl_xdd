@@ -17,23 +17,15 @@ information available via API from the
 ## Overview of BBL in records available in the GeoDeepDive database.
 
 We can use various search terms to identify potential uses of the BBL
-data or results in the literature. For example, here we found 15373
-unique publications which used any of the following phrases exactly.
-However, “BBL” is a common acronym in oil and gas and other fields. We
-can coarsely try to control for this by removing references to “oil” or
-“gas” in the highlights–this results in 11792 unqiue records – this
-still leaves us with a lot of irrelevant publications. For our purposes,
-we will work only with the 319 records associated with the following
-search
-terms:
+data or results in the literature. We exluded the term “BBL” here as
+this yields irrelevant references.
+<!-- For example, here we found 15373 unique publications which used the terms North American Bird Banding Laboratory, Bird Banding Laboratory, Bird Banding Lab, BBL. However, "BBL" is a common acronym in oil and gas and other fields. We can coarsely try to control for this by removing references to "oil" or "gas" in the highlights--this results in 11792 unqiue records -- this still leaves us with a lot of irrelevant publications. For our purposes, we will work only with the 319 records associated with the following search terms: -->
 
 | Exact search phrase                      | Number of unique records in xDD/GDD |
 | ---------------------------------------- | ----------------------------------- |
 | “North American Bird Banding Laboratory” | 8                                   |
-
-<!-- "BBL" |  11559 -->
-
-“Bird Banding Laboratory” | 270
+| “Bird Banding Laboratory”                | 270                                 |
+| “Bird Banding Lab”                       | 68                                  |
 
 Check out the use of the terms over time:
 ![](README_files/figure-gfm/pubsvtime-1.png)<!-- -->

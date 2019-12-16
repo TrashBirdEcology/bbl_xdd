@@ -45,14 +45,14 @@ bbl_xdd_reduced <- bbl_xdd %>%
   filter(searchterm !="BBL")
 ```
 
-We can use various search terms to identify potential uses of the BBL data or results in the literature. For example, here we found `r bbl_xdd %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unique publications which used any of the following phrases exactly. However, "BBL" is a common acronym in oil and gas and other fields. We can coarsely try to control for this by removing references to "oil" or "gas" in the highlights--this results in `r bbl_xdd_no_oilgas %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unqiue records -- this still leaves us with a lot of irrelevant publications. For our purposes, we will work only with the `r bbl_xdd_reduced %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` records associated with the following search terms:
+We can use various search terms to identify potential uses of the BBL data or results in the literature. We exluded the term "BBL" here as this yields irrelevant references. 
+<!-- For example, here we found `r bbl_xdd %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unique publications which used the terms `r unique(bbl_xdd$searchterm)`. However, "BBL" is a common acronym in oil and gas and other fields. We can coarsely try to control for this by removing references to "oil" or "gas" in the highlights--this results in `r bbl_xdd_no_oilgas %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unqiue records -- this still leaves us with a lot of irrelevant publications. For our purposes, we will work only with the `r bbl_xdd_reduced %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` records associated with the following search terms: -->
 
 Exact search phrase | Number of unique records in xDD/GDD 
 --------------|----
 "North American Bird Banding Laboratory" | `r bbl_xdd_reduced %>% filter(searchterm=="North American Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
-<!-- "BBL" |  `r bbl_xdd_no_oilgas %>% filter(searchterm=="BBL") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` -->
 "Bird Banding Laboratory" | `r bbl_xdd_reduced %>% filter(searchterm=="Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
-
+"Bird Banding Lab" | `r bbl_xdd_reduced %>% filter(searchterm=="Bird Banding Lab") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
 
 Check out the use of the terms over time: 
 ```{r pubsvtime, echo=FALSE}
@@ -91,6 +91,31 @@ ggdotchart(
           ggtheme = theme_minimal()
           )
 ```
+
+## Results Files
+Overviews of the results can be found in the [results](/results) folder in this repository.
+
+```{r write_outputs, include=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
+dir.create("results")
+
+write.csv(bbl_xdd, "results/all_results.csv")
+write.csv(bbl_xdd %>% filter(searchterm=="BBL"), "results/bbl_only_results.csv")
+```
+
+### Total records per publication
+Here is a comprehensive list of all publications with relevant terms (except "BBL"):
+```{r table_pubs, include=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
+library(kableExtra)
+bbl_xdd_reduced %>% 
+  group_by(pubname) %>% 
+  summarise(count = n()) %>% 
+  na.omit(pubname) %>% 
+  kable(caption = "Number of records (count) per publication name (pubname)") %>%
+  kable_styling()
+````
+
+
+
 
 
 ## This project relies on the UW Deepdive Infrastructure
