@@ -104,19 +104,15 @@ write.csv(bbl_xdd %>% filter(searchterm=="BBL"), "results/bbl_only_results.csv")
 
 ### Total records per publication
 Here is a comprehensive list of all publications with relevant terms (except "BBL"):
-```{r table_pubs, include=FALSE, echo=FALSE, warning=FALSE, message=FALSE}
+```{r table_pubs, echo=FALSE, warning=FALSE, message=FALSE}
 library(kableExtra)
 bbl_xdd_reduced %>% 
   group_by(pubname) %>% 
   summarise(count = n()) %>% 
   na.omit(pubname) %>% 
-  kable(caption = "Number of records (count) per publication name (pubname)") %>%
+  kable(caption = "Number of records (count) per publication name (pubname)", format="markdown") %>%
   kable_styling()
 ````
-
-
-
-
 
 ## This project relies on the UW Deepdive Infrastructure
 [Original branch from which this repository was forked](UW-Deepdive-Infrastructure/app-template). Check out [the wiki](https://github.com/UW-Deepdive-Infrastructure/app-template/wiki) for more information on getting started.
