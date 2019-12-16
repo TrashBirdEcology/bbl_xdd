@@ -1,36 +1,42 @@
-Using GeoDeepDive (xDD) to Track North American Breeding Bird Survey
+Using GeoDeepDive (xDD) to Track North American Bird Banding Laboratory
 Citations
 ================
-Last updated: 2019-12-13
+Last updated: 2019-12-16
 
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-lightgrey.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
 ## About
 
 This project seeks to identify publications within which the [USGS North
-American Breeding Bird Survey](https://www.pwrc.usgs.gov/bbs/) has been
-referenced or mentioned. This project uses pre-extracted information
-available via API from the [GeoDeepDive](https://geodeepdive.org)
-infrastructure.
+American Bird Banding
+Laboratory](https://www.usgs.gov/centers/pwrc/science/bird-banding-laboratory)
+has been referenced or mentioned. This project uses pre-extracted
+information available via API from the
+[GeoDeepDive](https://geodeepdive.org) infrastructure.
 
-## Overview of BBS in records available in the GeoDeepDive database.
+## Overview of BBL in records available in the GeoDeepDive database.
 
-We can use various search terms to identify potential uses of the
-[NABBS](https://www.pwrc.usgs.gov/bbs/) data or results in the
-literature. For example, here we found 2487 unique publications which
-used any of the following phrases
-exactly:
+We can use various search terms to identify potential uses of the BBL
+data or results in the literature. For example, here we found 15373
+unique publications which used any of the following phrases exactly.
+However, “BBL” is a common acronym in oil and gas and other fields. We
+can coarsely try to control for this by removing references to “oil” or
+“gas” in the highlights–this results in 11792 unqiue records – this
+still leaves us with a lot of irrelevant publications. For our purposes,
+we will work only with the 319 records associated with the following
+search
+terms:
 
-| Exacts earch phrase                   | Number of unique records in xDD/GDD |
-| ------------------------------------- | ----------------------------------- |
-| “North American Breeding Bird Survey” | 0                                   |
-| “Breeding Bird Survey”                | 0                                   |
-| “NABBS”                               | 0                                   |
+| Exact search phrase                      | Number of unique records in xDD/GDD |
+| ---------------------------------------- | ----------------------------------- |
+| “North American Bird Banding Laboratory” | 8                                   |
 
+<!-- "BBL" |  11559 -->
+
+“Bird Banding Laboratory” | 270
+
+Check out the use of the terms over time:
 ![](README_files/figure-gfm/pubsvtime-1.png)<!-- -->
-
-When we remove the redundancies in the records returned using the
-abovementioned searches,2509 remain.
 
 We can visualize the distribution of records among unique publishers.
 Few publications contain the bulk of the records.

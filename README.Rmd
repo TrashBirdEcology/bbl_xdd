@@ -28,7 +28,7 @@ source("R/get_xdd_df.R")
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 theme_set(ggpubr::theme_classic2())
 ```
-`r print(getwd())`
+
 ```{r bbl_xdd_import_and_munge, message=FALSE, warning=FALSE,echo=FALSE}
 # Import the JSON files and munge into a single data frame ----------------
 files <- list.files(here::here("xdd_json"), pattern='.txt', full.names=TRUE)
@@ -36,55 +36,39 @@ files <- list.files(here::here("xdd_json"), pattern='.txt', full.names=TRUE)
 # import and munge the xdd json into an R df
 bbl_xdd <- suppressWarnings(get_xdd_df(files)) # do not turn off suppresswarnings -- there an rmd bug its annoying..
 
+# try to remove products related to oil and gas
+bbl_xdd_no_oilgas <-  bbl_xdd %>% 
+  filter(!str_detect(tolower(highlight), "gas|oil" ))
+
+# remove the records with search term BBL:
+bbl_xdd_reduced <- bbl_xdd %>% 
+  filter(searchterm !="BBL")
 ```
 
-We can use various search terms to identify potential uses of the BBL data or results in the literature. For example, here we found `r bbl_xdd %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unique publications which used any of the following phrases exactly: 
+We can use various search terms to identify potential uses of the BBL data or results in the literature. For example, here we found `r bbl_xdd %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unique publications which used any of the following phrases exactly. However, "BBL" is a common acronym in oil and gas and other fields. We can coarsely try to control for this by removing references to "oil" or "gas" in the highlights--this results in `r bbl_xdd_no_oilgas %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` unqiue records -- this still leaves us with a lot of irrelevant publications. For our purposes, we will work only with the `r bbl_xdd_reduced %>% dplyr::select(-filename, -searchterm, -highlight) %>% n_distinct()` records associated with the following search terms:
 
-Exacts earch phrase | Number of unique records in xDD/GDD 
+Exact search phrase | Number of unique records in xDD/GDD 
 --------------|----
-"North American Bird Banding Laboratory" | `r bbl_xdd %>% filter(searchterm=="North American Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
-"BBL" |  `r bbl_xdd %>% filter(searchterm=="BBL") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
-"Bird Banding Laboratory" | `r bbl_xdd %>% filter(searchterm=="Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
+"North American Bird Banding Laboratory" | `r bbl_xdd_reduced %>% filter(searchterm=="North American Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
+<!-- "BBL" |  `r bbl_xdd_no_oilgas %>% filter(searchterm=="BBL") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` -->
+"Bird Banding Laboratory" | `r bbl_xdd_reduced %>% filter(searchterm=="Bird Banding Laboratory") %>% dplyr::select(-filename, -highlight) %>% n_distinct()` 
 
 
-The large number of records containing "BBL" are due to some gas and oil acronym. 
+Check out the use of the terms over time: 
 ```{r pubsvtime, echo=FALSE}
-tmp <- bbl_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)   
+tmp <- bbl_xdd_reduced %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)   
 ggplot(tmp %>% group_by(searchterm, coveryear) %>% 
-         summarise(total_pubs = n()) %>% na.omit() %>% 
-         filter(coveryear <= 2022, coveryear >=1980)) +
+         summarise(total_pubs = n()) %>% na.omit()) +
   geom_line(aes(x=coveryear, y=total_pubs, color=searchterm))+
   scale_color_manual(values=cbPalette)+
   labs(x="year", y="total records")+
   theme(legend.title=element_blank(), legend.position = "top")
 ``` 
-
-
-Removing the records with terms The large number of records containing "BBL" are due to some gas and oil acronym. 
-```{r pubsvtime, echo=FALSE}
-temp <- bbl_xdd %>% 
-  
-str_detect(bbl_xdd$highlight, "oil")
-           
-tmp <- bbl_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm, highlights)   
-ggplot(tmp %>% group_by(searchterm, coveryear) %>% 
-         summarise(total_pubs = n()) %>% na.omit() %>% 
-         filter(coveryear <= 2022, coveryear >=1980)) +
-  geom_line(aes(x=coveryear, y=total_pubs, color=searchterm))+
-  scale_color_manual(values=cbPalette)+
-  labs(x="year", y="total records")+
-  theme(legend.title=element_blank(), legend.position = "top")
-``` 
-
-
-
-
-When we remove the redundancies in the records returned using the abovementioned searches,`r bbl_xdd %>% dplyr::select(-filename, -highlight, -searchterm) %>% n_distinct() + bbl_xdd %>% dplyr::select(-filename, -highlight, -searchterm) %>% filter(is.na(doi))%>% distinct()  %>% nrow() ` remain. 
 
 We can visualize the distribution of  records among unique publishers. Few publications contain the bulk of the records. 
 ```{r topjrnls, echo=FALSE, message=FALSE, warning=FALSE}
-tmp <-  bbl_xdd %>% dplyr::select(-filename, -searchterm) %>% distinct()
-tmp <- bind_rows(tmp, bbl_xdd %>% dplyr::select(-filename, -searchterm)%>% filter(is.na(doi)) %>% distinct())
+tmp <-  bbl_xdd_reduced %>% dplyr::select(-filename, -searchterm) %>% distinct()
+tmp <- bind_rows(tmp, bbl_xdd_reduced %>% dplyr::select(-filename, -searchterm)%>% filter(is.na(doi)) %>% distinct())
 
 ggplot(tmp %>% group_by(pubname) %>% 
          summarise(n = n())) +
@@ -94,17 +78,15 @@ ggplot(tmp %>% group_by(pubname) %>%
 
 Viewing the publications with at least 25 unique records:
 ```{r topjrnls2, echo=FALSE, message=FALSE, warning=FALSE}
-tmp <- bbl_xdd %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)%>% group_by(pubname) %>% 
-         summarise(n = n()) %>% filter(n >25)   
-## the empty pubnames are USGS... so replace
-tmp$pubname <- sub("^$", "USGS", tmp$pubname)
+tmp <- bbl_xdd_reduced %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)%>% group_by(pubname) %>% 
+         summarise(n = n())   
 
 ggdotchart(
            tmp, x = "pubname", y = "n",
           rotate = TRUE,
           ylab="number of records", 
           xlab="",
-            sorting = "desc", title = "1980-present",
+            sorting = "desc",# title = "1980-present",
           ggtheme = theme_minimal()
           )
 ```
