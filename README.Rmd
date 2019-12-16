@@ -79,14 +79,15 @@ ggplot(tmp %>% group_by(pubname) %>%
 Viewing the publications with at least 25 unique records:
 ```{r topjrnls2, echo=FALSE, message=FALSE, warning=FALSE}
 tmp <- bbl_xdd_reduced %>% distinct(coveryear, pubname, publisher, title, authors, searchterm)%>% group_by(pubname) %>% 
-         summarise(n = n())   
+         summarise(n = n()) %>% 
+  filter(n>1)
 
 ggdotchart(
            tmp, x = "pubname", y = "n",
           rotate = TRUE,
           ylab="number of records", 
           xlab="",
-            sorting = "desc",# title = "1980-present",
+            sorting = "desc",title = "> 1 record in the publication",
           ggtheme = theme_minimal()
           )
 ```
