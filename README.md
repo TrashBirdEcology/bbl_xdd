@@ -115,14 +115,11 @@ Here is a comprehensive list of all publications with relevant terms
 | Wildlife Society Bulletin                                                  |    24 |
 | Zeitschrift für Tierpsychologie                                            |     1 |
 
-## This project relies on the UW Deepdive Infrastructure
+## More Information
+This project relies on the [UW Deepdive Infrastructure](UW-Deepdive-Infrastructure/app-template) and was adapted from [@dwief-usgs](https://github.com/dwief-usgs/knowledge-extraction/blob/master/test-notebooks/search-xdd-for-term.ipynb)for more
+details. 
 
-[Original branch from which this repository was
-forked](UW-Deepdive-Infrastructure/app-template). Check out [the
-wiki](https://github.com/UW-Deepdive-Infrastructure/app-template/wiki)
-for more information on getting started.
-
-## USGS Provisional Software
+## Disclaimer
 
 This software is preliminary or provisional and is subject to revision.
 It is being provided to meet the need for timely best science. The
